@@ -50,7 +50,6 @@ export const getAllTeachers = async (req, res) => {
 export const deleteTeacher = async (req, res) => {
   try {
     const { id } = req.params;
-
     const [existing] = await db.execute(
       "SELECT id FROM teachers WHERE id = ?",
       [id]
@@ -60,11 +59,51 @@ export const deleteTeacher = async (req, res) => {
         messages: `Teacher not found with this ${id}`,
       });
     }
-
     await db.execute("DELETE FROM teachers WHERE id = ?", [id]);
     return res.status(200).json({
       message: `Teacher deleted successfully with id ${id}`,
     });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const updateTeacher = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const { name, email, phone, position } = req.body;
+    // 1. Check if teacher exists
+    const [teacher] = await db.execute("SELECT * FROM teachers WHERE id = ?", [
+      id,
+    ]);
+
+    if (teacher.length === 0) {
+      return res.status(404).json({ message: "Teacher not found" });
+    }
+
+    const [existEmail] = await db.execute(
+      "SELECT email FROM teachers WHERE email = ?",
+      [email]
+    );
+
+    if (existEmail.length > 0) {
+      return res.status(404).json({ message: "Email already exit" });
+    }
+
+    const oldTeacher = teacher[0];
+
+    await db.execute(
+      "UPDATE teachers SET name = ?, email = ?, phone = ?, position = ? WHERE id = ?",
+      [
+        name ?? oldTeacher.name,
+        email ?? oldTeacher.email,
+        phone ?? oldTeacher.phone,
+        position ?? oldTeacher.position,
+        id,
+      ]
+    );
+
+    res.status(200).json({ message: "Teacher updated successfully" });
   } catch (error) {
     console.log(error);
   }

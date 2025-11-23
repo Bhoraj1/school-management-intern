@@ -14,3 +14,12 @@ CREATE TABLE teachers (
     phone VARCHAR(20) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE vacancy(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    position VARCHAR(100) NOT NULL,
+    description TEXT NULL,
+    deadline VARCHAR(100) NOT NULL, 
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)
+
