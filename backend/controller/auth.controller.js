@@ -4,19 +4,19 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 dotenv.config();
 
-export const getAllUsers = async (req, res) => {
+export const getAllUsers = async (req, res, next) => {
   try {
     const users = await db.query("SELECT * FROM users");
     res.status(200).json({
       data: users,
     });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
 // Login Api
-export const login = async (req, res) => {
+export const login = async (req, res, next) => {
   try {
     //1. get email and password from user side.
     const { email, password } = req.body;
@@ -34,18 +34,19 @@ export const login = async (req, res) => {
     ]);
 
     const user = result[0];
+
+    //User found?
+    if (result.length === 0) {
+      return res.status(400).json({
+        message: "Invalid Credentials",
+      });
+    }
+
     // Check the foud user password
     const isMatch = await bcryptjs.compare(password, user.password);
 
     if (!isMatch) {
       return res.status(401).json({ message: "Invalid credentials" });
-    }
-
-    // 3. User found?
-    if (result.length === 0) {
-      return res.status(400).json({
-        message: "Invalid Credentials",
-      });
     }
 
     // jsonwebtoken
@@ -82,17 +83,16 @@ export const login = async (req, res) => {
       },
     });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
 // signout APIs
-export const signout = async (req, res) => {
+export const signout = async (req, res, next) => {
   try {
     res.clearCookie("token");
     res.status(200).json({ message: "Successfully signed out" });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
-
