@@ -1,6 +1,6 @@
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../../redux/features/authState";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 
 const Dashboard = () => {
@@ -19,8 +19,20 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="h-screen flex justify-center items-center">
-      <div className="text-center">
+    <div className="h-screen flex ">
+      {/* First section */}
+      <div className="bg-blue-950 pt-3 ">
+        <Link
+          to="/dashboard/teacher"
+          className="text-white text-xl p-2 bg-amber-300
+           m-2 rounded-md  "
+        >
+          Add Teacher
+        </Link>
+      </div>
+
+      {/* Second Section */}
+      <div className="flex mx-auto justify-center items-center ">
         <h1 className="font-bold text-3xl">Welcome {email} </h1>
         <button
           onClick={handleLogout}
