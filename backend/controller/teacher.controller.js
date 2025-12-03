@@ -68,41 +68,53 @@ export const deleteTeacher = async (req, res, next) => {
 };
 
 export const updateTeacher = async (req, res, next) => {
-  const { id } = req.params;
   try {
-    const { name, email, phone, position } = req.body;
-    // 1. Check if teacher exists
-    const [teacher] = await db.execute("SELECT * FROM teachers WHERE id = ?", [
-      id,
-    ]);
+    const { id } = req.params;
+    const updateData = req.body;
 
-    if (teacher.length === 0) {
-      return res.status(404).json({ message: "Teacher not found" });
-    }
-
-    const [existEmail] = await db.execute(
-      "SELECT email FROM teachers WHERE email = ?",
-      [email]
+    // Check if teacher exists
+    const [existing] = await db.execute(
+      "SELECT id FROM teachers WHERE id = ?",
+      [id]
     );
 
-    if (existEmail.length > 0) {
-      return res.status(404).json({ message: "Email already exit" });
+    if (existing.length === 0) {
+      return res.status(404).json({
+        message: `Teacher not found with id ${id}`,
+      });
     }
 
-    const oldTeacher = teacher[0];
+    // Check if email already exists for another teacher
+    if (updateData.email) {
+      const [emailCheck] = await db.execute(
+        "SELECT id FROM teachers WHERE email = ? AND id != ?",
+        [updateData.email, id]
+      );
 
-    await db.execute(
-      "UPDATE teachers SET name = ?, email = ?, phone = ?, position = ? WHERE id = ?",
-      [
-        name ?? oldTeacher.name,
-        email ?? oldTeacher.email,
-        phone ?? oldTeacher.phone,
-        position ?? oldTeacher.position,
-        id,
-      ]
-    );
+      if (emailCheck.length > 0) {
+        return res.status(409).json({
+          message: "Email already exists. Use another email.",
+        });
+      }
+    }
 
-    res.status(200).json({ message: "Teacher updated successfully" });
+    // Build dynamic update query
+    const fields = Object.keys(updateData);
+    const values = Object.values(updateData);
+
+    if (fields.length === 0) {
+      return res.status(400).json({ message: "No fields to update" });
+    }
+
+    const setClause = fields.map((field) => `${field} = ?`).join(", ");
+    values.push(id);
+
+    // Update teacher
+    await db.execute(`UPDATE teachers SET ${setClause} WHERE id = ?`, values);
+
+    return res.status(200).json({
+      message: "Teacher updated successfully",
+    });
   } catch (error) {
     next(error);
   }

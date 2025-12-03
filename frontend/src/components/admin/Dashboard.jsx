@@ -2,11 +2,14 @@ import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../../redux/features/authState";
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
+import { useSignoutMutation } from "../../redux/features/authSlice";
+import { toast } from "react-toastify";
 
 const Dashboard = () => {
   const { email, isAuth } = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [signout] = useSignoutMutation();
 
   useEffect(() => {
     if (!isAuth) {
@@ -14,8 +17,15 @@ const Dashboard = () => {
     }
   }, [isAuth]);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     dispatch(logout());
+    try {
+      const res = await signout().unwrap();
+      toast.success(res.message || "Logged out successfully");
+      navigate("/");
+    } catch (error) {
+      toast.error(error.data?.message || "Logout failed");
+    }
   };
 
   return (
@@ -27,7 +37,7 @@ const Dashboard = () => {
           className="text-white text-xl p-2 bg-amber-300
            m-2 rounded-md  "
         >
-          Add Teacher
+          Teacher
         </Link>
       </div>
 
