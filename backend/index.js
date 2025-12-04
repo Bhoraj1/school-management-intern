@@ -13,14 +13,15 @@ app.use(cookieParser());
 // To parse JSON request bodies
 app.use(express.json());
 
+// Serve uploaded files as static content
+app.use("/uploads", express.static("uploads"));
+
 app.use(
   cors({
     origin: "http://localhost:5173",
     credentials: true,
   })
 );
-
-// app.use(express.urlencoded({ extended: true }));
 
 const port = process.env.port;
 
