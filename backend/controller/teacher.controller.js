@@ -1,7 +1,6 @@
 import db from "../config/dbconnect.js";
 import { removeImg } from "../utils/removeImg.js";
 
-
 export const addTeacher = async (req, res, next) => {
   try {
     const { name, email, phone, position } = req.body;
@@ -43,6 +42,7 @@ export const addTeacher = async (req, res, next) => {
 
     return res.status(201).json({
       message: "Teacher added successfully",
+      imageUrl: imagePath,
     });
   } catch (error) {
     if (req.file) {
@@ -68,7 +68,7 @@ export const deleteTeacher = async (req, res, next) => {
   try {
     const { id } = req.params;
     const [existing] = await db.execute(
-      "SELECT id FROM teachers WHERE id = ?",
+      "SELECT id, img FROM teachers WHERE id = ?",
       [id]
     );
     if (existing.length === 0) {
@@ -76,6 +76,12 @@ export const deleteTeacher = async (req, res, next) => {
         messages: `Teacher not found with this ${id}`,
       });
     }
+
+    // Delete image if exists
+    if (existing[0].img) {
+      removeImg(`uploads/teachers/${existing[0].img.split("/").pop()}`);
+    }
+
     await db.execute("DELETE FROM teachers WHERE id = ?", [id]);
     return res.status(200).json({
       message: `Teacher deleted successfully with id ${id}`,
