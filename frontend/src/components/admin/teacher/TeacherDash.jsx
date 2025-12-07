@@ -70,6 +70,7 @@ const TeacherDash = () => {
       email: teacher.email,
       position: teacher.position,
       phone: teacher.phone,
+      image: teacher.img,
     });
     setIsModalOpen(true);
   };
@@ -94,21 +95,25 @@ const TeacherDash = () => {
       return;
     }
 
-    const changedData = {};
+    const changedData = new FormData();
+
     if (formData.name !== originalData.name) {
-      changedData.name = formData.name;
+      changedData.append("name", formData.name);
     }
     if (formData.email !== originalData.email) {
-      changedData.email = formData.email;
+      changedData.append("email", formData.email);
     }
     if (formData.position !== originalData.position) {
-      changedData.position = formData.position;
+      changedData.append("position", formData.position);
     }
     if (formData.phone !== originalData.phone) {
-      changedData.phone = formData.phone;
+      changedData.append("phone", formData.phone);
+    }
+    if (formData.image) {
+      changedData.append("image", formData.image);
     }
 
-    if (Object.keys(changedData).length === 0) {
+    if (changedData.length === 0) {
       toast.info("No changes made");
       return;
     }
@@ -195,6 +200,7 @@ const TeacherDash = () => {
                 <td className="px-6 py-4 text-sm text-gray-700">
                   {teacher.phone}
                 </td>
+
                 <td className="px-6 py-4 text-sm text-gray-700">
                   <div className="space-x-4 ">
                     <button
@@ -257,6 +263,21 @@ const TeacherDash = () => {
                 onChange={handleChange}
                 className="w-full p-2 border rounded mb-3"
               />
+
+              {formData.image ? (
+                <img
+                  src={`${import.meta.env.VITE_IMG_URL}${formData.image}`}
+                  alt={formData.name}
+                  className="w-12 h-12 object-cover rounded"
+                />
+              ) : (
+                <div className="w-12 h-12 bg-gray-200 flex items-center justify-center rounded text-xs">
+                  No Image
+                </div>
+              )}
+
+
+      
 
               <input
                 type="file"

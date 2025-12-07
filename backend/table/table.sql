@@ -25,3 +25,5 @@ CREATE TABLE vacancy(
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )
 
+
+
