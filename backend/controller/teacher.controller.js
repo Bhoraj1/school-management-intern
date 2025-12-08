@@ -54,11 +54,28 @@ export const addTeacher = async (req, res, next) => {
 
 export const getAllTeachers = async (req, res, next) => {
   try {
-    const [result] = await db.execute("SELECT * FROM teachers");
+    let { page = 1, limit = 2 } = req.query;
+    page = Number(page);
+    limit = Number(limit);
+
+    const offset = (page - 1) * limit;
+
+    const [result] = await db.execute(
+      `SELECT * FROM teachers ORDER BY id DESC LIMIT ${limit} OFFSET ${offset} `
+    );
+
+    const [[{ total }]] = await db.execute(
+      "SELECT COUNT(*) AS total FROM teachers"
+    );
 
     res.status(200).json({
       message: "All Teachers",
       teachers: result,
+      limit,
+      page,
+      offset,
+      totalPages: Math.ceil(total / limit),
+      reamaining: total - (offset + limit),
     });
   } catch (error) {
     next(error);

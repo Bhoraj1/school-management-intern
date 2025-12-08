@@ -264,20 +264,13 @@ const TeacherDash = () => {
                 className="w-full p-2 border rounded mb-3"
               />
 
-              {formData.image ? (
+              {!isAdding && formData.image ? (
                 <img
                   src={`${import.meta.env.VITE_IMG_URL}${formData.image}`}
                   alt={formData.name}
                   className="w-12 h-12 object-cover rounded"
                 />
-              ) : (
-                <div className="w-12 h-12 bg-gray-200 flex items-center justify-center rounded text-xs">
-                  No Image
-                </div>
-              )}
-
-
-      
+              ) : null}
 
               <input
                 type="file"
