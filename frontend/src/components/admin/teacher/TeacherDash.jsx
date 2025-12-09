@@ -7,6 +7,7 @@ import {
 } from "../../../redux/features/teacherSlice";
 import Loading from "../../shared/Loading";
 import { useState } from "react";
+import Pagination from "../../shared/Pagination";
 
 const initialData = {
   name: "",
@@ -23,10 +24,16 @@ const TeacherDash = () => {
   const [isAdding, setIsAdding] = useState(false);
 
   const [formData, setFormData] = useState(initialData);
-  const { data, isLoading, error } = useGetAllTeachersQuery();
+  const [page, setPage] = useState(1);
+  const { data, isLoading, error } = useGetAllTeachersQuery({
+    page,
+    limit: 5,
+  });
+
   const [deleteTeacher] = useDeleteTeacherMutation();
   const [updateTeacher] = useUpdateTeacherMutation();
   const [addTeacher] = useAddTeacherMutation();
+  const totalPages = data?.totalPages;
 
   const handleChange = (e) => {
     const { id, value } = e.target;
@@ -221,6 +228,11 @@ const TeacherDash = () => {
             ))}
           </tbody>
         </table>
+        <Pagination
+          page={page}
+          totalPages={totalPages}
+          onPageChange={setPage}
+        />
 
         {teachers.length === 0 && (
           <p className="p-4 text-center text-gray-500">No teacher data found</p>

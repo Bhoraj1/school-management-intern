@@ -3,8 +3,8 @@ import { indexSlice } from "./indexSlice";
 export const teacherAPIs = indexSlice.injectEndpoints({
   endpoints: (builder) => ({
     getAllTeachers: builder.query({
-      query: () => ({
-        url: "/teacher/all-teachers",
+      query: ({ page, limit }) => ({
+        url: `/teacher/all-teachers?page=${page}&limit=${limit}`,
         method: "GET",
       }),
       providesTags: ["teacher"],

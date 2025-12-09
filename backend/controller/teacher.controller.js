@@ -2,7 +2,13 @@ import db from "../config/dbconnect.js";
 import { removeImg } from "../utils/removeImg.js";
 
 export const addTeacher = async (req, res, next) => {
+  const { role } = req.user;
   try {
+    if (role !== "admin") {
+      return res.status(403).json({
+        message: "Access denied. Admins only.",
+      });
+    }
     const { name, email, phone, position } = req.body;
 
     if (!name || !email || !phone || !position) {
@@ -54,7 +60,7 @@ export const addTeacher = async (req, res, next) => {
 
 export const getAllTeachers = async (req, res, next) => {
   try {
-    let { page = 1, limit = 2 } = req.query;
+    let { page = 1, limit = 10 } = req.query;
     page = Number(page);
     limit = Number(limit);
 
