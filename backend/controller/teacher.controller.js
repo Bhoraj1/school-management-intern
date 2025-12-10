@@ -1,14 +1,9 @@
 import db from "../config/dbconnect.js";
 import { removeImg } from "../utils/removeImg.js";
+import { compressImg } from "../utils/sharpHandler.js";
 
 export const addTeacher = async (req, res, next) => {
-  const { role } = req.user;
   try {
-    if (role !== "admin") {
-      return res.status(403).json({
-        message: "Access denied. Admins only.",
-      });
-    }
     const { name, email, phone, position } = req.body;
 
     if (!name || !email || !phone || !position) {
@@ -35,10 +30,12 @@ export const addTeacher = async (req, res, next) => {
       });
     }
 
-    // Get image path if uploaded
-    const imagePath = req.file
-      ? `/uploads/teachers/${req.file.filename}`
-      : null;
+    let imagePath = "";
+    if (req.file) {
+      const outputPath = `uploads/teachers/school-${req.file.filename}`;
+      await compressImg(req.file.path, outputPath);
+      imagePath = outputPath;
+    }
 
     // Insert Teacher with image
     await db.execute(
@@ -162,7 +159,9 @@ export const updateTeacher = async (req, res, next) => {
     // Handle image update
     let updatedImg = teacher.img;
     if (req.file) {
-      updatedImg = `/uploads/teachers/${req.file.filename}`;
+      const outputPath = `uploads/teachers/compress-${req.file.filename}`;
+      await compressImg(req.file.path, outputPath);
+      updatedImg = `/uploads/teachers/compress-${req.file.filename}`;
 
       if (teacher.img) {
         removeImg(`uploads/teachers/${teacher.img.split("/").pop()}`);

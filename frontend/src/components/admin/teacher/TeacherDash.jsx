@@ -8,6 +8,7 @@ import {
 import Loading from "../../shared/Loading";
 import { useState } from "react";
 import Pagination from "../../shared/Pagination";
+import { useSelector } from "react-redux";
 
 const initialData = {
   name: "",
@@ -18,6 +19,7 @@ const initialData = {
 };
 
 const TeacherDash = () => {
+  const { role } = useSelector((state) => state.user);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [teacherId, setTeacherId] = useState();
   const [originalData, setOriginalData] = useState({});
@@ -189,7 +191,7 @@ const TeacherDash = () => {
               <tr key={teacher.id} className="hover:bg-gray-50">
                 <td className="px-6 py-4 text-sm text-gray-800">
                   <img
-                    src={`${import.meta.env.VITE_IMG_URL}${teacher.img}`}
+                    src={`${import.meta.env.VITE_IMG_URL}/${teacher.img}`}
                     alt={teacher.img ? teacher.name : "No Image"}
                     className="w-12 h-12 object-cover"
                   />
@@ -209,20 +211,23 @@ const TeacherDash = () => {
                 </td>
 
                 <td className="px-6 py-4 text-sm text-gray-700">
-                  <div className="space-x-4 ">
-                    <button
-                      onClick={() => handleDelete(teacher)}
-                      className="cursor-pointer"
-                    >
-                      Delete
-                    </button>
-                    <button
-                      onClick={() => handleEdit(teacher)}
-                      className="cursor-pointer"
-                    >
-                      Edit
-                    </button>
-                  </div>
+                    {role === "admin" && (
+                    <div className="space-x-4 ">
+                      {}
+                      <button
+                        onClick={() => handleDelete(teacher)}
+                        className="cursor-pointer"
+                      >
+                        Delete
+                      </button>
+                      <button
+                        onClick={() => handleEdit(teacher)}
+                        className="cursor-pointer"
+                      >
+                        Edit
+                      </button>
+                    </div>
+                  )}
                 </td>
               </tr>
             ))}
